@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import dispatch from './components/reducers/dispatch';
+import dispatch from './components/reducers/reducer';
 const store = createStore(dispatch);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

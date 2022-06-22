@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { ADDUSER, DELETEUSER, SAVEUSER } from "./actions/action";
+import { ADDUSER, DELETEUSER, SAVEUSER, GETUSER, getUser } from "./actions/action";
 import PlusCircleOutlined from "@ant-design/icons/PlusCircleOutlined"
-import "./styles/listUser.scss"
+import "./styles/listUser.scss";
 const ListUser = () => {
-    const selector = useSelector(state => state);
+    const selector = useSelector((state, action) => state);
     const dispatch = useDispatch()
+    const [listData, setListData] = useState([]);
     const [listOption, setListOption] = useState([]);
     const [optionJob, setOptionJob] = useState("chưa chọn Job");
     const RefBoxAdd = useRef()
@@ -15,23 +16,46 @@ const ListUser = () => {
         a: 0,
         b: 10
     })
-    const [listData, setListData] = useState([]);
+
+
     const [listAddUser, setListAddUser] = useState({})
     const [abs, setAbs] = useState(0)
+
+
+    useEffect(() => {
+        dispatch(getUser());
+    }, [])
+
+    useEffect(() => {
+        // console.log("selector", selector)
+        setListData(selector?.user)
+    }, [selector])
+
+    console.log("listData", listData)
+    useEffect(() => {
+        // async function Test() {
+        //     const user = await selector
+        //     console.log("user", user)
+        //     if (user) {
+        //         setListData(user.data)
+        //     }
+        // }
+        // Test()
+        console.log('selector', selector)
+    }, [selector])
+    async function sss() {
+        const a = await selector;
+        console.log(a)
+    } sss()
     //Handel-function 
-    const handelDeleteUser = (id) => {
+    const handelDeleteUser = async (id) => {
         dispatch(DELETEUSER(id))
         setAbs(abs + 1)
+        const ass = await selector;
+        console.log(ass)
     }
-    useEffect(() => {
-        const getData = async () => {
-            const a = await axios.get("https://62b0f5d1196a9e98702d90ca.mockapi.io/users")
-                .then((user) => setListData(user.data))
-            const b = await axios.get("https://62b0f5d1196a9e98702d90ca.mockapi.io/jobs")
-                .then((user) => setListOption(user.data))
-        }
-        getData()
-    }, [listData])
+
+
     const GetDate = (date) => {
         const dates = new Date(date);
         const getDate = `${dates.getDay()} - ${dates.getMonth()} - ${dates.getFullYear()}`
@@ -141,8 +165,15 @@ const ListUser = () => {
             [e.target.name]: e.target.value
         })
     }
+    const handelUserId = (e) => {
+        setListAddUser({
+            ...listAddUser,
+            [e.target.name]: e.target.value
+        })
+    }
     const handelAddUser = () => {
         dispatch(ADDUSER(listAddUser))
+        console.log(listAddUser)
     }
     const handelToggleAddUser = () => {
         if (RefBoxAdd.current.style.display == "none") {
@@ -151,6 +182,28 @@ const ListUser = () => {
             RefBoxAdd.current.style.display = "none"
         }
     }
+
+    const handleTextChange = useCallback((label) => {
+        switch (label) {
+            case "FirstName":
+                setListAddUser({
+                    ...listAddUser,
+                    [e.target.name]: e.target.value
+                })
+        }
+    }, [])
+
+    const renderItemInput = useCallback((label, placeholder, handle) => {
+        const onChange = () => {
+            handleTextChange(label)
+        }
+        return (
+            <div className="nameUser">
+                <b>{label} :</b>
+                <input type={"text"} placeholder={placeholder} name="firstName" onChange={onChange} />
+            </div>
+        )
+    })
 
     return (
         <div>
@@ -161,10 +214,11 @@ const ListUser = () => {
                     <b>THÊM NHÂN VIÊN</b>
                     <div className="BoxAddUser" ref={RefBoxAdd}>
                         <h1>ADD USER</h1>
-                        <div className="nameUser">
+                        {/* <div className="nameUser">
                             <b>FirstName :</b>
                             <input type={"text"} placeholder="FirstName" name="firstName" onChange={handelFirstName} />
-                        </div>
+                        </div> */}
+                        {renderItemInput("FirstName", "FirstName", handelFirstName)}
                         <div className="nameUser">
                             <b>LastName :</b>
                             <input type={"text"} placeholder="LastName" name="LastName" onChange={handelLastName} />
@@ -206,6 +260,10 @@ const ListUser = () => {
                                 })}
                             </select>
                         </div>
+                        <div className="nameUser">
+                            <b>id :</b>
+                            <input type={"text"} placeholder="id" name="id" onChange={handelUserId} />
+                        </div>
                         <button className="BtnAddUser" onClick={handelAddUser}>ADD</button>
                     </div>
                 </div>
@@ -222,7 +280,7 @@ const ListUser = () => {
                     <th>Vị trí</th>
                     <th></th>
                 </tr>
-                {EData(Getdatas(as.a, as.b))}
+                {EData(listData)}
             </table>
             <div>
                 {Ebutton()}
