@@ -55,8 +55,8 @@ const SearchUser = () => {
         })
     }
     const handelCancel = () => {
-        RefBoxFixUser.current.style.display = "none";
-        setToggleBgFix(false)
+        setToggleBgFix(false);
+        RefBoxFixUser.current.style.display = "none"
     }
     const GetDate = (date) => {
         const dates = new Date(date);
@@ -86,14 +86,12 @@ const SearchUser = () => {
         })
         setShowFixUser(id);
         setIdFix(listSearch.filter(user => user.id == id));
+        setToggleBgFix(!toggleBgFix)
         if (RefBoxFixUser.current.style.display == "block") {
-            RefBoxFixUser.current.style.display = "none";
-            setToggleBgFix(false)
+            RefBoxFixUser.current.style.display = "none"
         } else {
-            RefBoxFixUser.current.style.display = "block";
-            setToggleBgFix(true)
+            RefBoxFixUser.current.style.display = "block"
         }
-
     }
     const handelDeleteUser = (id) => {
         dispatch(deleteUser(id))
@@ -144,8 +142,10 @@ const SearchUser = () => {
                                                 <b>id :</b>
                                                 <span>{id}</span>
                                             </div>
-                                            <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
-                                            <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
+                                            <div className="groupBtn">
+                                                <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
+                                                <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
+                                            </div>
                                         </div>
                                     )
                                 })

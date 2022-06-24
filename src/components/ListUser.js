@@ -55,7 +55,7 @@ const ListUser = () => {
         const arrayBtn = [];
         for (let i = 0; i < selector.user.length / 10; i++) {
             arrayBtn.push(<button key={i} onClick={() => {
-                RefBoxFixUser.current.style.display = "none";
+                setToggleBgFix(true)
                 setAbs(i)
             }} className={`${i == abs && "active_Slide_Page"} btnPage`}>{i}</button>)
         }
@@ -87,7 +87,7 @@ const ListUser = () => {
         return listData.map((user, index) => {
             const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
             return (
-                <tfoot key={index} className={(showFixUser == id && !toggleBgFix) ? "activeFix" : ""}>
+                <tfoot key={index} className={(showFixUser == id && toggleBgFix) ? "activeFix" : ""}>
                     <tr >
                         <td>{id}</td>
                         <td>
