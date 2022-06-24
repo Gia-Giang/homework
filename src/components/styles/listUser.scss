@@ -48,7 +48,8 @@ img {
 
 // BoxUser
 
-.BoxAddUser {
+.BoxAddUser,
+.BoxFixUser {
     width: 300px;
     background-color: rgb(194, 194, 194);
     position: absolute;
@@ -56,15 +57,21 @@ img {
     left: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-items: center;
     padding: 0 20px 20px 20px;
     border-radius: 20px;
     display: none;
 }
 
+.BoxFixUser {
+    position: fixed;
+    top: 20px;
+    left: 1100px;
+}
+
 .nameUser {
     width: 100%;
-    height: 50px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -1,5 +1,3 @@
-
-
 const initState = {
     user: []
 }
@@ -7,22 +5,31 @@ const initState = {
 const reducers = (state = initState, action) => {
     switch (action.type) {
         case "GETUSER":
-            console.log(action)
             return {
                 ...state,
                 user: action?.content,
             }
         case "ADDUSER":
-            // return axios({
-            //     method: 'post',
-            //     url: 'https://62b0f5d1196a9e98702d90ca.mockapi.io/users',
-            //     data: action.content
-            // });
-            return state
+            return {
+                ...state,
+                user: state.user.concat(action.content)
+            }
         case "DELETEUSER":
-            // await axios.delete(`https://62b0f5d1196a9e98702d90ca.mockapi.io/users/${action.content}`)
-            // return state = axios.get("https://62b0f5d1196a9e98702d90ca.mockapi.io/users")
-            return state
+            return {
+                ...state,
+                user: state.user.filter(user => user.id !== action.content.id)
+            }
+        case "SAVEUSER":
+            console.log("action", action.content)
+            return {
+                ...state,
+                user: state.user.map((user) => {
+                    if (user.id == action.content.id) {
+                        user = action.content
+                    }
+                    return user
+                })
+            }
         default: return state
     }
 }

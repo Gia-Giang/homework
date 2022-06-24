@@ -1,132 +1,126 @@
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { ADDUSER, DELETEUSER, SAVEUSER, GETUSER, getUser } from "./actions/action";
+import { ADDUSER, DELETEUSER, SAVEUSER, GETUSER, getUser, deleteUser, addUser, saveUser } from "./actions/action";
 import PlusCircleOutlined from "@ant-design/icons/PlusCircleOutlined"
 import "./styles/listUser.scss";
 const ListUser = () => {
+    const RefBoxAdd = useRef();
+    const RefBoxFixUser = useRef();
+    //
+    const [showFixUser, setShowFixUser] = useState();
+    const [idFix, setIdFix] = useState([])
+
     const selector = useSelector((state, action) => state);
     const dispatch = useDispatch()
     const [listData, setListData] = useState([]);
     const [listOption, setListOption] = useState([]);
     const [optionJob, setOptionJob] = useState("chưa chọn Job");
-    const RefBoxAdd = useRef()
-    const [as, setAs] = useState({
-        a: 0,
-        b: 10
-    })
-
-
     const [listAddUser, setListAddUser] = useState({})
-    const [abs, setAbs] = useState(0)
-
-
+    const [abs, setAbs] = useState(0);
+    useEffect(() => {
+        axios.get("https://62b0f5d1196a9e98702d90ca.mockapi.io/jobs")
+            .then(user => setListOption(user.data))
+    }, [])
     useEffect(() => {
         dispatch(getUser());
     }, [])
 
     useEffect(() => {
-        // console.log("selector", selector)
         setListData(selector?.user)
     }, [selector])
-
-    console.log("listData", listData)
-    useEffect(() => {
-        // async function Test() {
-        //     const user = await selector
-        //     console.log("user", user)
-        //     if (user) {
-        //         setListData(user.data)
-        //     }
-        // }
-        // Test()
-        console.log('selector', selector)
-    }, [selector])
-    async function sss() {
-        const a = await selector;
-        console.log(a)
-    } sss()
     //Handel-function 
-    const handelDeleteUser = async (id) => {
-        dispatch(DELETEUSER(id))
-        setAbs(abs + 1)
-        const ass = await selector;
-        console.log(ass)
+    const handelDeleteUser = (id) => {
+        dispatch(deleteUser(id))
+        setListData(selector?.user)
     }
-
-
     const GetDate = (date) => {
         const dates = new Date(date);
         const getDate = `${dates.getDay()} - ${dates.getMonth()} - ${dates.getFullYear()}`
         return getDate
     }
     const handelSlide = (i) => {
-        setAs(() => ({
-            a: i * 10,
-            b: i * 10 + 10
-        }))
-    }
-    const Ebutton = () => {
-        const arrayBtn = [];
-        for (let i = 0; i < listData.length / 10; i++) {
-            arrayBtn.push(<button key={i} onClick={() => handelSlide(i)}>{i}</button>)
-        }
-        return arrayBtn
-    }
-    const EData = (listData) => {
-        return listData.map((user) => {
-            const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
-            return (
-                <tr key={id}>
-                    <td>{id}</td>
-                    <td>
-                        <img src={avatar} />
-                    </td>
-                    <td>{firstName + lastName}</td>
-                    <td>{userName}</td>
-                    <td>{email}</td>
-                    <td>{`${streetAddress} , ${city} , ${country}`}</td>
-                    <td>{GetDate(createdAt)}</td>
-                    <td>{jobTitle}</td>
-                    <td>
-                        <span className="fixUser">Fix</span>
-                        <span className="deleteUser" onClick={() => handelDeleteUser(id)}>X</span>
-                    </td>
-                </tr>
-            )
-        })
-    }
-    const Getdatas = (first, last) => {
-        const CheckList = listData.filter((user) => {
-            if (user.id >= first && user.id < last) {
+        const a = i * 10;
+        const b = a + 10;
+        const c = selector.user.filter((user, index) => {
+            if (index >= a && index < b) {
                 return user
             }
         })
-        return CheckList
+        return c
+
     }
-    const handelFirstName = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
+    const Ebutton = () => {
+        const arrayBtn = [];
+        for (let i = 0; i < selector.user.length / 10; i++) {
+            arrayBtn.push(<button key={i} onClick={() => setAbs(i)}>{i}</button>)
+        }
+        return arrayBtn
     }
-    const handelLastName = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
+
+    const handelSaveUser = (id) => {
+        dispatch(saveUser(id, listAddUser))
+        setListData(selector?.data)
     }
-    const handelAvatar = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
-    }
-    const handelEmail = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
+
+    const EData = (listData) => {
+        return listData.map((user, index) => {
+            const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
+
+            return (
+                <tfoot key={index}>
+                    <tr >
+                        <td>{id}</td>
+                        <td>
+                            <img src={avatar} />
+                        </td>
+                        <td>{firstName + lastName}</td>
+                        <td>{userName}</td>
+                        <td>{email}</td>
+                        <td>{`${streetAddress} , ${city} , ${country}`}</td>
+                        <td>{GetDate(createdAt)}</td>
+                        <td>{jobTitle}</td>
+                        <td style={{ position: "relative" }}>
+                            {showFixUser == id &&
+                                idFix.map(users => {
+                                    return (
+                                        <div className="BoxFixUser" ref={RefBoxFixUser}>
+                                            <h1>FIX USER</h1>
+                                            {renderItemInput("FirstName", "firstName", "firstName", users.firstName)}
+                                            {renderItemInput("LastName", "lastName", "lastName", users.lastName)}
+                                            {renderItemInput("avatar", "avatar", "avatar", users.avatar)}
+                                            {renderItemInput("Email", "email", "email", users.email)}
+                                            {renderItemInput("streetAddress", "streetAddress", "streetAddress", users.streetAddress)}
+                                            {renderItemInput("city", "city", "city", users.city)}
+                                            {renderItemInput("country", "country", "country", users.country)}
+                                            {renderItemInput("createdAt", "createdAt", "createdAt", users.createdAt)}
+                                            {renderItemInput("userName", "userName", "userName", users.userName)}
+                                            <div className="nameUser">
+                                                <b>Vị trí :</b>
+                                                <select name="jobTitle" onChange={handelJob}>
+                                                    <option>{optionJob}</option>
+                                                    {listOption.map((user) => {
+                                                        return <option key={user.id}>{user.type}</option>
+                                                    })}
+                                                </select>
+                                            </div>
+                                            <div className="nameUser">
+                                                <b>id :</b>
+                                                <span>{id}</span>
+                                            </div>
+                                            <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
+                                            <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
+                                        </div>
+                                    )
+                                })
+                            }
+                            <span className="fixUser" onClick={() => handelFixUser(id, user)}>Fix</span>
+                            <span className="deleteUser" onClick={() => handelDeleteUser(id)}>X</span>
+                        </td>
+                    </tr>
+                </tfoot>
+            )
         })
     }
     const handelJob = (e) => {
@@ -135,46 +129,14 @@ const ListUser = () => {
             [e.target.name]: e.target.value
         })
     }
-    const handelUserName = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
-    }
-    const handelCreatedAt = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
-    }
-    const handelCountry = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
-    }
-    const handelcity = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
-    }
-    const handelstreetAddress = (e) => {
-        setListAddUser({
-            ...listAddUser,
-            [e.target.name]: e.target.value
-        })
-    }
+
     const handelUserId = (e) => {
         setListAddUser({
             ...listAddUser,
             [e.target.name]: e.target.value
         })
     }
-    const handelAddUser = () => {
-        dispatch(ADDUSER(listAddUser))
-        console.log(listAddUser)
-    }
+
     const handelToggleAddUser = () => {
         if (RefBoxAdd.current.style.display == "none") {
             RefBoxAdd.current.style.display = "block"
@@ -183,28 +145,45 @@ const ListUser = () => {
         }
     }
 
-    const handleTextChange = useCallback((label) => {
-        switch (label) {
-            case "FirstName":
-                setListAddUser({
-                    ...listAddUser,
-                    [e.target.name]: e.target.value
-                })
-        }
-    }, [])
+    const handleTextChange = (e, value) => {
+        setListAddUser({
+            ...listAddUser,
+            [e.target.name]: e.target.value
+        })
+    }
 
-    const renderItemInput = useCallback((label, placeholder, handle) => {
-        const onChange = () => {
-            handleTextChange(label)
+    const renderItemInput = (label, placeholder, name, value) => {
+        const onChange = (e) => {
+            handleTextChange(e)
         }
         return (
             <div className="nameUser">
                 <b>{label} :</b>
-                <input type={"text"} placeholder={placeholder} name="firstName" onChange={onChange} />
+                <input type={"text"} placeholder={placeholder} name={name} onChange={(e) => onChange(e, value)} value={listAddUser[name] || value} />
             </div>
         )
-    })
+    }
+    const handelAddUser = () => {
+        dispatch(addUser())
+        setListData(listData || [])
+    }
+    const handelFixUser = (id, user) => {
+        if (RefBoxFixUser.current.style.display == "block") {
+            RefBoxFixUser.current.style.display = "none"
+        } else {
+            RefBoxFixUser.current.style.display = "block"
+        }
+        setListAddUser({
+            ...user
+        })
+        setListData(selector?.user)
+        setShowFixUser(id);
+        setIdFix(listData.filter(user => user.id == id))
 
+    }
+    const handelCancel = () => {
+        RefBoxFixUser.current.style.display = "none"
+    }
     return (
         <div>
             <div>
@@ -214,43 +193,15 @@ const ListUser = () => {
                     <b>THÊM NHÂN VIÊN</b>
                     <div className="BoxAddUser" ref={RefBoxAdd}>
                         <h1>ADD USER</h1>
-                        {/* <div className="nameUser">
-                            <b>FirstName :</b>
-                            <input type={"text"} placeholder="FirstName" name="firstName" onChange={handelFirstName} />
-                        </div> */}
-                        {renderItemInput("FirstName", "FirstName", handelFirstName)}
-                        <div className="nameUser">
-                            <b>LastName :</b>
-                            <input type={"text"} placeholder="LastName" name="LastName" onChange={handelLastName} />
-                        </div>
-                        <div className="nameUser">
-                            <b>Avatar :</b>
-                            <input type={"text"} placeholder="avatar" name="avatar" onChange={handelAvatar} />
-                        </div>
-                        <div className="nameUser">
-                            <b>Email :</b>
-                            <input type={"email"} placeholder="Email" name="email" onChange={handelEmail} />
-                        </div>
-                        <div className="nameUser">
-                            <b>Nơi ở :</b>
-                            <input type={"text"} placeholder="streetAddress " name="streetAddress" onChange={handelstreetAddress} />
-                        </div>
-                        <div className="nameUser">
-                            <b>Nơi ở :</b>
-                            <input type={"text"} placeholder="city " name="city" onChange={handelcity} />
-                        </div>
-                        <div className="nameUser">
-                            <b>Nơi ở :</b>
-                            <input type={"text"} placeholder="country" name="country" onChange={handelCountry} />
-                        </div>
-                        <div className="nameUser">
-                            <b>Ngày làm việc :</b>
-                            <input type={"date"} placeholder="createdAt" name="createdAt" onChange={handelCreatedAt} />
-                        </div>
-                        <div className="nameUser">
-                            <b>Ngày làm việc :</b>
-                            <input type={"date"} placeholder="userName" name="userName" onChange={handelUserName} />
-                        </div>
+                        {renderItemInput("FirstName", "firstName", "firstName")}
+                        {renderItemInput("LastName", "lastName", "lastName")}
+                        {renderItemInput("avatar", "avatar", "avatar")}
+                        {renderItemInput("Email", "email", "email")}
+                        {renderItemInput("streetAddress", "streetAddress", "streetAddress")}
+                        {renderItemInput("city", "city", "city")}
+                        {renderItemInput("country", "country", "country")}
+                        {renderItemInput("createdAt", "createdAt", "createdAt")}
+                        {renderItemInput("userName", "userName", "userName")}
                         <div className="nameUser">
                             <b>Vị trí :</b>
                             <select name="jobTitle" onChange={handelJob}>
@@ -269,18 +220,20 @@ const ListUser = () => {
                 </div>
             </div>
             <table className="listUsers" cellSpacing={0} cellPadding={5}>
-                <tr>
-                    <th>STT</th>
-                    <th></th>
-                    <th>Tên</th>
-                    <th>Tên khác</th>
-                    <th>Email</th>
-                    <th>Nơi ở</th>
-                    <th>Ngày làm việc</th>
-                    <th>Vị trí</th>
-                    <th></th>
-                </tr>
-                {EData(listData)}
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th></th>
+                        <th>Tên</th>
+                        <th>Tên khác</th>
+                        <th>Email</th>
+                        <th>Nơi ở</th>
+                        <th>Ngày làm việc</th>
+                        <th>Vị trí</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                {EData(handelSlide(abs))}
             </table>
             <div>
                 {Ebutton()}
