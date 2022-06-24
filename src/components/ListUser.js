@@ -2,16 +2,17 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import PlusCircleOutlined from "@ant-design/icons/PlusCircleOutlined";
 import { ADDUSER, DELETEUSER, SAVEUSER, GETUSER, getUser, deleteUser, addUser, saveUser } from "./actions/action";
-import PlusCircleOutlined from "@ant-design/icons/PlusCircleOutlined"
+import SearchUser from "./searchUser";
 import "./styles/listUser.scss";
 const ListUser = () => {
     const RefBoxAdd = useRef();
     const RefBoxFixUser = useRef();
+    const [toggleBgFix, setToggleBgFix] = useState(true)
     //
     const [showFixUser, setShowFixUser] = useState();
     const [idFix, setIdFix] = useState([])
-
     const selector = useSelector((state, action) => state);
     const dispatch = useDispatch()
     const [listData, setListData] = useState([]);
@@ -49,12 +50,11 @@ const ListUser = () => {
             }
         })
         return c
-
     }
     const Ebutton = () => {
         const arrayBtn = [];
         for (let i = 0; i < selector.user.length / 10; i++) {
-            arrayBtn.push(<button key={i} onClick={() => setAbs(i)}>{i}</button>)
+            arrayBtn.push(<button key={i} onClick={() => setAbs(i)} className={`${i == abs && "active_Slide_Page"} btnPage`}>{i}</button>)
         }
         return arrayBtn
     }
@@ -63,13 +63,27 @@ const ListUser = () => {
         dispatch(saveUser(id, listAddUser))
         setListData(selector?.data)
     }
+    const handelFixUser = (id, user) => {
+        setListAddUser({
+            ...user
+        })
+        setListData(selector?.user)
+        setShowFixUser(id);
+        setIdFix(listData.filter(user => user.id == id));
+        if (RefBoxFixUser.current.style.display == "block") {
+            RefBoxFixUser.current.style.display = "none";
+            setToggleBgFix(false)
+        } else {
+            RefBoxFixUser.current.style.display = "block";
+            setToggleBgFix(true)
+        }
 
+    }
     const EData = (listData) => {
         return listData.map((user, index) => {
             const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
-
             return (
-                <tfoot key={index}>
+                <tfoot key={index} className={(showFixUser == id && toggleBgFix) ? "activeFix" : ""}>
                     <tr >
                         <td>{id}</td>
                         <td>
@@ -85,7 +99,7 @@ const ListUser = () => {
                             {showFixUser == id &&
                                 idFix.map(users => {
                                     return (
-                                        <div className="BoxFixUser" ref={RefBoxFixUser}>
+                                        <div key={id} className="BoxFixUser" ref={RefBoxFixUser} style={{ display: "block" }}>
                                             <h1>FIX USER</h1>
                                             {renderItemInput("FirstName", "firstName", "firstName", users.firstName)}
                                             {renderItemInput("LastName", "lastName", "lastName", users.lastName)}
@@ -138,10 +152,10 @@ const ListUser = () => {
     }
 
     const handelToggleAddUser = () => {
-        if (RefBoxAdd.current.style.display == "none") {
-            RefBoxAdd.current.style.display = "block"
-        } else {
+        if (RefBoxAdd.current.style.display == "block") {
             RefBoxAdd.current.style.display = "none"
+        } else {
+            RefBoxAdd.current.style.display = "block"
         }
     }
 
@@ -167,26 +181,14 @@ const ListUser = () => {
         dispatch(addUser())
         setListData(listData || [])
     }
-    const handelFixUser = (id, user) => {
-        if (RefBoxFixUser.current.style.display == "block") {
-            RefBoxFixUser.current.style.display = "none"
-        } else {
-            RefBoxFixUser.current.style.display = "block"
-        }
-        setListAddUser({
-            ...user
-        })
-        setListData(selector?.user)
-        setShowFixUser(id);
-        setIdFix(listData.filter(user => user.id == id))
 
-    }
     const handelCancel = () => {
-        RefBoxFixUser.current.style.display = "none"
+        RefBoxFixUser.current.style.display = "none";
+        setToggleBgFix(false)
     }
     return (
-        <div>
-            <div>
+        <>
+            <div className="sum">
                 <h1>LIST USER</h1>
                 <div className="addUser">
                     <PlusCircleOutlined style={{ fontSize: "30px" }} onClick={handelToggleAddUser} />
@@ -218,6 +220,9 @@ const ListUser = () => {
                         <button className="BtnAddUser" onClick={handelAddUser}>ADD</button>
                     </div>
                 </div>
+                <div className="search">
+                    <Link to={"/SearchUser"}>SEARCH</Link>
+                </div>
             </div>
             <table className="listUsers" cellSpacing={0} cellPadding={5}>
                 <thead>
@@ -238,7 +243,7 @@ const ListUser = () => {
             <div>
                 {Ebutton()}
             </div>
-        </div>
+        </>
     )
 }
 export default ListUser
