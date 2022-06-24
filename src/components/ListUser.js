@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, createRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PlusCircleOutlined from "@ant-design/icons/PlusCircleOutlined";
 import { ADDUSER, DELETEUSER, SAVEUSER, GETUSER, getUser, deleteUser, addUser, saveUser } from "./actions/action";
@@ -8,8 +8,8 @@ import SearchUser from "./searchUser";
 import "./styles/listUser.scss";
 const ListUser = () => {
     const RefBoxAdd = useRef();
-    const RefBoxFixUser = useRef();
-    const [toggleBgFix, setToggleBgFix] = useState(true)
+    const RefBoxFixUser = createRef();
+    const [toggleBgFix, setToggleBgFix] = useState(false)
     //
     const [showFixUser, setShowFixUser] = useState();
     const [idFix, setIdFix] = useState([])
@@ -54,7 +54,10 @@ const ListUser = () => {
     const Ebutton = () => {
         const arrayBtn = [];
         for (let i = 0; i < selector.user.length / 10; i++) {
-            arrayBtn.push(<button key={i} onClick={() => setAbs(i)} className={`${i == abs && "active_Slide_Page"} btnPage`}>{i}</button>)
+            arrayBtn.push(<button key={i} onClick={() => {
+                RefBoxFixUser.current.style.display = "none";
+                setAbs(i)
+            }} className={`${i == abs && "active_Slide_Page"} btnPage`}>{i}</button>)
         }
         return arrayBtn
     }
@@ -62,6 +65,8 @@ const ListUser = () => {
     const handelSaveUser = (id) => {
         dispatch(saveUser(id, listAddUser))
         setListData(selector?.data)
+        RefBoxFixUser.current.style.display = "none";
+        setToggleBgFix(false)
     }
     const handelFixUser = (id, user) => {
         setListAddUser({
@@ -72,18 +77,17 @@ const ListUser = () => {
         setIdFix(listData.filter(user => user.id == id));
         if (RefBoxFixUser.current.style.display == "block") {
             RefBoxFixUser.current.style.display = "none";
-            setToggleBgFix(false)
+
         } else {
             RefBoxFixUser.current.style.display = "block";
-            setToggleBgFix(true)
+            setToggleBgFix(!toggleBgFix)
         }
-
     }
     const EData = (listData) => {
         return listData.map((user, index) => {
             const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
             return (
-                <tfoot key={index} className={(showFixUser == id && toggleBgFix) ? "activeFix" : ""}>
+                <tfoot key={index} className={(showFixUser == id && !toggleBgFix) ? "activeFix" : ""}>
                     <tr >
                         <td>{id}</td>
                         <td>
@@ -123,8 +127,10 @@ const ListUser = () => {
                                                 <b>id :</b>
                                                 <span>{id}</span>
                                             </div>
-                                            <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
-                                            <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
+                                            <div className="groupBtn">
+                                                <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
+                                                <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
+                                            </div>
                                         </div>
                                     )
                                 })
@@ -133,7 +139,7 @@ const ListUser = () => {
                             <span className="deleteUser" onClick={() => handelDeleteUser(id)}>X</span>
                         </td>
                     </tr>
-                </tfoot>
+                </tfoot >
             )
         })
     }
@@ -166,20 +172,22 @@ const ListUser = () => {
         })
     }
 
-    const renderItemInput = (label, placeholder, name, value) => {
+    const renderItemInput = (label, placeholder, name, value, type) => {
         const onChange = (e) => {
             handleTextChange(e)
         }
         return (
             <div className="nameUser">
                 <b>{label} :</b>
-                <input type={"text"} placeholder={placeholder} name={name} onChange={(e) => onChange(e, value)} value={listAddUser[name] || value} />
+                <input type={type} placeholder={placeholder} name={name} onChange={(e) => onChange(e, value)} value={listAddUser[name] || value} />
             </div>
         )
     }
     const handelAddUser = () => {
-        dispatch(addUser())
+        dispatch(addUser(listAddUser))
         setListData(listData || [])
+        setListAddUser("")
+        RefBoxAdd.current.style.display = "none"
     }
 
     const handelCancel = () => {
@@ -188,22 +196,21 @@ const ListUser = () => {
     }
     return (
         <>
+            <h1 className="headerSum">LIST USER</h1>
             <div className="sum">
-                <h1>LIST USER</h1>
                 <div className="addUser">
                     <PlusCircleOutlined style={{ fontSize: "30px" }} onClick={handelToggleAddUser} />
-                    <b>THÊM NHÂN VIÊN</b>
                     <div className="BoxAddUser" ref={RefBoxAdd}>
                         <h1>ADD USER</h1>
-                        {renderItemInput("FirstName", "firstName", "firstName")}
-                        {renderItemInput("LastName", "lastName", "lastName")}
-                        {renderItemInput("avatar", "avatar", "avatar")}
-                        {renderItemInput("Email", "email", "email")}
-                        {renderItemInput("streetAddress", "streetAddress", "streetAddress")}
-                        {renderItemInput("city", "city", "city")}
-                        {renderItemInput("country", "country", "country")}
-                        {renderItemInput("createdAt", "createdAt", "createdAt")}
-                        {renderItemInput("userName", "userName", "userName")}
+                        {renderItemInput("FirstName", "firstName", "firstName", "", "text")}
+                        {renderItemInput("LastName", "lastName", "lastName", "", "text")}
+                        {renderItemInput("avatar", "avatar", "avatar", "", "text")}
+                        {renderItemInput("Email", "email", "email", "", "email")}
+                        {renderItemInput("streetAddress", "streetAddress", "streetAddress", "", "text")}
+                        {renderItemInput("city", "city", "city", "", "text")}
+                        {renderItemInput("country", "country", "country", "", "text")}
+                        {renderItemInput("createdAt", "createdAt", "createdAt", "", "date")}
+                        {renderItemInput("userName", "userName", "userName", "", "text")}
                         <div className="nameUser">
                             <b>Vị trí :</b>
                             <select name="jobTitle" onChange={handelJob}>

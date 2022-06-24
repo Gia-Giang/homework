@@ -1,6 +1,24 @@
+:root {
+    --ant-color: #ff4d4f;
+    --ant-color1: white;
+    --ant-color-hover: #ff7875;
+    --ant-color-active: #d9363e;
+    --user-bgColor: rgb(255, 148, 148);
+    --ant-btn-delete: rgb(15, 15, 255);
+    --var-height: 30px;
+    --var-border-radius: 5px;
+    --var-inputSearch: 200px;
+}
+
+.headerSum {
+    text-align: center;
+    color: var(--ant-color);
+}
+
 .sum {
     margin: auto;
     text-align: center;
+    display: flex;
 }
 
 .listUsers {
@@ -20,7 +38,8 @@ td {
 
 tfoot {
     &:hover {
-        background-color: rgba(224, 224, 224, 0.4);
+        background-color: var(--user-bgColor);
+        color: var(--ant-color1);
     }
 }
 
@@ -44,26 +63,31 @@ a {
 }
 
 .fixUser {
-    color: rgb(122, 122, 122);
+    color: var(--ant-color-active);
 }
 
 .deleteUser {
-    color: rgb(73, 150, 124);
+    color: var(--ant-btn-delete)
 }
 
 .addUser,
 .search {
-    width: 180px;
     height: 40px;
     padding: 0px 10px;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background-color: rgba(131, 131, 131, 0.462);
+    background-color: var(--ant-color);
     border-radius: 40px;
     position: relative;
     margin-bottom: 10px;
     cursor: pointer;
+    margin: 0 10px;
+    color: var(--ant-color1);
+
+    a {
+        color: var(--ant-color1);
+    }
 }
 
 // BoxUser
@@ -71,7 +95,8 @@ a {
 .BoxAddUser,
 .BoxFixUser {
     width: 300px;
-    background-color: rgb(194, 194, 194);
+    background-color: var(--ant-color);
+    color: var(--ant-color1);
     position: absolute;
     top: 50px;
     left: 10px;
@@ -81,6 +106,10 @@ a {
     padding: 0 20px 20px 20px;
     border-radius: 20px;
     display: none;
+
+    input {
+        outline: none;
+    }
 }
 
 .BoxFixUser {
@@ -109,12 +138,14 @@ a {
     border-radius: 10px;
     border: none;
     font-weight: bold;
-    background-color: rgb(255, 246, 234);
-    color: rgb(132, 132, 132);
+    background-color: var(--ant-color1);
+    color: var(--ant-color);
+    margin-top: 20px;
 }
 
 .activeFix {
-    background-color: rgba(224, 224, 224, 0.4);
+    background-color: var(--ant-color-hover);
+    color: var(--ant-color1);
 }
 
 //search
@@ -128,18 +159,75 @@ a {
 .btnPage {
     width: 30px;
     height: 30px;
-    background-color: rgb(0, 235, 235);
+    background-color: var(--ant-color);
     color: white;
     border: none;
     margin-right: 2px;
 
     &:hover {
-        background-color: rgba(239, 239, 239, 0.66);
-        color: rgb(134, 134, 255);
+        background-color: var(--ant-color-hover);
+        color: var(--ant-color1);
     }
 }
 
 .active_Slide_Page {
-    background-color: rgba(239, 239, 239, 0.66);
-    color: rgb(134, 134, 255);
+    background-color: var(--ant-color-active);
+    color: var(--ant-color1);
+}
+
+.Btn_Back {
+    position: absolute;
+    left: 0px;
+    top: 50px;
+    width: 70px;
+    height: 40px;
+    background-color: var(--ant-color);
+    color: var(--ant-color1);
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+
+    &:active {
+        background-color: var(--ant-color-active);
+        color: var(--ant-color1);
+    }
+}
+
+.groupBtn {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.formSearch {
+    height: var(--var-height);
+
+    input {
+        width: var(--var-inputSearch);
+        height: 100%;
+        border: 2px solid var(--ant-color);
+        border-radius: var(--var-border-radius);
+        padding: 0px;
+        outline: none;
+        padding-left: 5px;
+    }
+
+    button {
+        width: 40px;
+        height: 110%;
+        border: none;
+        color: var(--ant-color1);
+        background-color: var(--ant-color);
+        border-radius: var(--var-border-radius);
+        font-size: 15px;
+        margin-left: 5px;
+
+        &:active {
+            background-color: var(--ant-color-active);
+        }
+    }
 }

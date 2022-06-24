@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import { getUser, saveUser, deleteUser } from "./actions/action";
 import "./styles/listSearchUser.scss";
 import SearchOutlined from "@ant-design/icons/SearchOutlined";
+import LeftOutlined from "@ant-design/icons/LeftOutlined";
 import ListUser from "./ListUser";
 const SearchUser = () => {
     const selector = useSelector(state => state);
@@ -159,9 +161,9 @@ const SearchUser = () => {
     const handelChangeSearch = (e) => {
         setUserSearch(e.target.value)
     }
-    const BtnSearchUser = () => {
+    const BtnSearchUser = (select) => {
         const ar = []
-        selector.user.map((user) => {
+        select.user.map((user) => {
             for (var i in user) {
                 const b = user[i].toString().toLowerCase();
                 const c = userSearch.toLowerCase();
@@ -173,16 +175,20 @@ const SearchUser = () => {
         })
         setListSearch(ar);
         setAbs(0)
-        console.log(ar)
     }
     return (
         <div className="searchUser">
+            <Link to={"/"} className="Btn_Back">Back</Link>
             <div className="headerSearch">
                 <h1>SEARCH USER</h1>
             </div>
             <div className="formSearch">
-                <input type={"text"} placeholder="search" onChange={handelChangeSearch} />
-                <button onClick={BtnSearchUser}>
+                <input type={"text"} placeholder="search" onChange={handelChangeSearch} onKeyDown={e => {
+                    if (e.keyCode == 13) {
+                        BtnSearchUser(selector)
+                    }
+                }} />
+                <button onClick={() => BtnSearchUser(selector)}>
                     <SearchOutlined />
                 </button>
             </div>
