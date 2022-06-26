@@ -43,7 +43,6 @@ export const deleteUser = (id) => {
     }
 }
 export const addUser = (value) => {
-    console.log("value", value)
     return dispatch => {
         axios.post('https://62b0f5d1196a9e98702d90ca.mockapi.io/users/', { ...value }).then(
             (res => {

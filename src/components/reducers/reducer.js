@@ -12,7 +12,7 @@ const reducers = (state = initState, action) => {
         case "ADDUSER":
             return {
                 ...state,
-                user: state.user.concat(action.content)
+                user: [...state.user, action.content]
             }
         case "DELETEUSER":
             return {

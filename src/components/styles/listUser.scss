@@ -8,6 +8,7 @@
     --var-height: 30px;
     --var-border-radius: 5px;
     --var-inputSearch: 200px;
+    --var-overPlay: transparent;
 }
 
 .headerSum {
@@ -27,6 +28,7 @@
 }
 
 th {
+    min-width: 50px;
     height: 40px;
     text-align: left;
 }
@@ -34,6 +36,11 @@ th {
 td {
     text-align: left;
     border-top: 1px solid rgb(176, 176, 176);
+}
+
+thead {
+    position: relative;
+    z-index: 10;
 }
 
 tfoot {
@@ -106,6 +113,7 @@ a {
     padding: 0 20px 20px 20px;
     border-radius: 20px;
     display: none;
+    z-index: 200;
 
     input {
         outline: none;
@@ -205,6 +213,7 @@ a {
 
 .formSearch {
     height: var(--var-height);
+    z-index: 100;
 
     input {
         width: var(--var-inputSearch);
@@ -230,4 +239,13 @@ a {
             background-color: var(--ant-color-active);
         }
     }
+}
+
+.boxOverplay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: var(--var-overPlay);
 }

@@ -4,12 +4,13 @@ import { useState, useEffect, useRef, useCallback, useMemo, createRef } from "re
 import { useSelector, useDispatch } from "react-redux";
 import PlusCircleOutlined from "@ant-design/icons/PlusCircleOutlined";
 import { ADDUSER, DELETEUSER, SAVEUSER, GETUSER, getUser, deleteUser, addUser, saveUser } from "./actions/action";
+import SortListUser from "./recycle_SortUser";
 import SearchUser from "./searchUser";
 import "./styles/listUser.scss";
 const ListUser = () => {
     const RefBoxAdd = useRef();
     const RefBoxFixUser = createRef();
-    const [toggleBgFix, setToggleBgFix] = useState(false)
+    const [toggleBgFix, setToggleBgFix] = useState(true)
     //
     const [showFixUser, setShowFixUser] = useState();
     const [idFix, setIdFix] = useState([])
@@ -49,6 +50,7 @@ const ListUser = () => {
                 return user
             }
         })
+
         return c
     }
     const Ebutton = () => {
@@ -77,11 +79,13 @@ const ListUser = () => {
         setIdFix(listData.filter(user => user.id == id));
         if (RefBoxFixUser.current.style.display == "block") {
             RefBoxFixUser.current.style.display = "none";
+            setToggleBgFix(false)
 
         } else {
             RefBoxFixUser.current.style.display = "block";
-            setToggleBgFix(!toggleBgFix)
+            setToggleBgFix(true)
         }
+        console.log(RefBoxFixUser)
     }
     const EData = (listData) => {
         return listData.map((user, index) => {
@@ -91,7 +95,7 @@ const ListUser = () => {
                     <tr >
                         <td>{id}</td>
                         <td>
-                            <img src={avatar} />
+                            <img src={avatar} title="ERROR" />
                         </td>
                         <td>{firstName + lastName}</td>
                         <td>{userName}</td>
@@ -101,40 +105,38 @@ const ListUser = () => {
                         <td>{jobTitle}</td>
                         <td style={{ position: "relative" }}>
                             {showFixUser == id &&
-                                idFix.map(users => {
-                                    return (
-                                        <div key={id} className="BoxFixUser" ref={RefBoxFixUser} style={{ display: "block" }}>
-                                            <h1>FIX USER</h1>
-                                            {renderItemInput("FirstName", "firstName", "firstName", users.firstName)}
-                                            {renderItemInput("LastName", "lastName", "lastName", users.lastName)}
-                                            {renderItemInput("avatar", "avatar", "avatar", users.avatar)}
-                                            {renderItemInput("Email", "email", "email", users.email)}
-                                            {renderItemInput("streetAddress", "streetAddress", "streetAddress", users.streetAddress)}
-                                            {renderItemInput("city", "city", "city", users.city)}
-                                            {renderItemInput("country", "country", "country", users.country)}
-                                            {renderItemInput("createdAt", "createdAt", "createdAt", users.createdAt)}
-                                            {renderItemInput("userName", "userName", "userName", users.userName)}
-                                            <div className="nameUser">
-                                                <b>Vị trí :</b>
-                                                <select name="jobTitle" onChange={handelJob}>
-                                                    <option>{optionJob}</option>
-                                                    {listOption.map((user) => {
-                                                        return <option key={user.id}>{user.type}</option>
-                                                    })}
-                                                </select>
-                                            </div>
-                                            <div className="nameUser">
-                                                <b>id :</b>
-                                                <span>{id}</span>
-                                            </div>
-                                            <div className="groupBtn">
-                                                <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
-                                                <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
-                                            </div>
-                                        </div>
-                                    )
-                                })
+                                <div key={id} className="BoxFixUser" ref={RefBoxFixUser} style={{ display: "none" }}>
+                                    <h1>FIX USER</h1>
+                                    {renderItemInput("FirstName", "firstName", "firstName", user.firstName)}
+                                    {renderItemInput("LastName", "lastName", "lastName", user.lastName)}
+                                    {renderItemInput("avatar", "avatar", "avatar", user.avatar)}
+                                    {renderItemInput("Email", "email", "email", user.email)}
+                                    {renderItemInput("streetAddress", "streetAddress", "streetAddress", user.streetAddress)}
+                                    {renderItemInput("city", "city", "city", user.city)}
+                                    {renderItemInput("country", "country", "country", user.country)}
+                                    {renderItemInput("createdAt", "createdAt", "createdAt", user.createdAt)}
+                                    {renderItemInput("userName", "userName", "userName", user.userName)}
+                                    <div className="nameUser">
+                                        <b>Vị trí :</b>
+                                        <select name="jobTitle" onChange={handelJob}>
+                                            <option>{optionJob}</option>
+                                            {listOption.map((user) => {
+                                                return <option key={user.id}>{user.type}</option>
+                                            })}
+                                        </select>
+                                    </div>
+                                    <div className="nameUser">
+                                        <b>id :</b>
+                                        <span>{id}</span>
+                                    </div>
+                                    <div className="groupBtn">
+                                        <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
+                                        <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
+                                    </div>
+                                </div>
+
                             }
+
                             <span className="fixUser" onClick={() => handelFixUser(id, user)}>Fix</span>
                             <span className="deleteUser" onClick={() => handelDeleteUser(id)}>X</span>
                         </td>
@@ -194,8 +196,15 @@ const ListUser = () => {
         RefBoxFixUser.current.style.display = "none";
         setToggleBgFix(false)
     }
+    const handelBoxOverplay = (e) => {
+        e.stopPropagation();
+        setToggleBgFix(false);
+        RefBoxFixUser.current.style.display = "none";
+        RefBoxAdd.current.style.display = "none"
+    }
     return (
         <>
+            <div className="boxOverplay" onClick={handelBoxOverplay}></div>
             <h1 className="headerSum">LIST USER</h1>
             <div className="sum">
                 <div className="addUser">
@@ -247,7 +256,7 @@ const ListUser = () => {
                 </thead>
                 {EData(handelSlide(abs))}
             </table>
-            <div>
+            <div style={{ zIndex: 100, position: "absolute" }}>
                 {Ebutton()}
             </div>
         </>

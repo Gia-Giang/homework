@@ -6,6 +6,7 @@ import "./styles/listSearchUser.scss";
 import SearchOutlined from "@ant-design/icons/SearchOutlined";
 import LeftOutlined from "@ant-design/icons/LeftOutlined";
 import ListUser from "./ListUser";
+import SortListUser from "./recycle_SortUser";
 const SearchUser = () => {
     const selector = useSelector(state => state);
     const dispatch = useDispatch();
@@ -19,6 +20,11 @@ const SearchUser = () => {
     const [listAddUser, setListAddUser] = useState({});
     const [optionJob, setOptionJob] = useState("chưa chọn Job");
     const [listOption, setListOption] = useState([]);
+    const [handelSort, setHandelSort] = useState({
+        handel: "sort",
+        title: "id"
+    })
+    console.log(listSearch)
     useEffect(() => {
         dispatch(getUser());
     }, [listSearch])
@@ -63,7 +69,8 @@ const SearchUser = () => {
         const getDate = `${dates.getDay()} - ${dates.getMonth()} - ${dates.getFullYear()}`
         return getDate
     }
-    const handelSlide = (i) => {
+    const handelSlide = (i, title, handel) => {
+        const ar = []
         const a = i * 10;
         const b = a + 10;
         const c = listSearch.filter((user, index) => {
@@ -88,18 +95,26 @@ const SearchUser = () => {
         setIdFix(listSearch.filter(user => user.id == id));
         setToggleBgFix(!toggleBgFix)
         if (RefBoxFixUser.current.style.display == "block") {
-            RefBoxFixUser.current.style.display = "none"
+            RefBoxFixUser.current.style.display = "none";
+            setToggleBgFix(false)
         } else {
             RefBoxFixUser.current.style.display = "block"
+            setToggleBgFix(true)
         }
     }
     const handelDeleteUser = (id) => {
         dispatch(deleteUser(id))
         setListSearch(listSearch.filter(user => user.id !== id))
     }
-
+    const handelSortAscending = (title, handel) => {
+        setHandelSort({
+            handel: handel,
+            title: title
+        })
+    }
     const renderList = (list) => {
-        return list.map((user, index) => {
+        const a = list[handelSort.handel]((a, b) => a[handelSort.title] > (b[handelSort.title]));
+        return a.map((user, index) => {
             const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
             return (
                 <tfoot key={id} className={(showFixUser == id && toggleBgFix) ? "activeFix" : ""}>
@@ -118,7 +133,7 @@ const SearchUser = () => {
                             {showFixUser == id &&
                                 idFix.map(users => {
                                     return (
-                                        <div key={id} className="BoxFixUser" ref={RefBoxFixUser} style={{ display: "block" }}>
+                                        <div key={id} className="BoxFixUser" ref={RefBoxFixUser} style={{ display: "none" }}>
                                             <h1>FIX USER</h1>
                                             {renderItemInput("FirstName", "firstName", "firstName", users.firstName)}
                                             {renderItemInput("LastName", "lastName", "lastName", users.lastName)}
@@ -176,8 +191,14 @@ const SearchUser = () => {
         setListSearch(ar);
         setAbs(0)
     }
+    const handelBoxOverplay = (e) => {
+        e.stopPropagation();
+        setToggleBgFix(false);
+        RefBoxFixUser.current.style.display = "none";
+    }
     return (
         <div className="searchUser">
+            <div className="boxOverplay" onClick={handelBoxOverplay}></div>
             <Link to={"/"} className="Btn_Back">Back</Link>
             <div className="headerSearch">
                 <h1>SEARCH USER</h1>
@@ -196,20 +217,22 @@ const SearchUser = () => {
                 <table className="listUsers" cellSpacing={0} cellPadding={5}>
                     <thead>
                         <tr>
-                            <th>STT</th>
+                            <th><span>STT</span> <SortListUser title="id" onclick={handelSortAscending} /></th>
                             <th></th>
-                            <th>Tên</th>
-                            <th>Tên khác</th>
-                            <th>Email</th>
-                            <th>Nơi ở</th>
-                            <th>Ngày làm việc</th>
-                            <th>Vị trí</th>
+                            <th>Tên<SortListUser title="FirstName" onclick={handelSortAscending} /></th>
+                            <th>Tên khác<SortListUser title="userName" onclick={handelSortAscending} /></th>
+                            <th>Email<SortListUser title="email" onclick={handelSortAscending} /></th>
+                            <th>Nơi ở<SortListUser title="streetAddress" onclick={handelSortAscending} /></th>
+                            <th>Ngày làm việc<SortListUser title="createdAt" onclick={handelSortAscending} /></th>
+                            <th>Vị trí<SortListUser title="jobTitle" onclick={handelSortAscending} /></th>
                             <th></th>
                         </tr>
                     </thead>
                     {renderList(handelSlide(abs))}
                 </table>
-                {Ebutton()}
+                <div style={{ zIndex: 100, position: "absolute" }}>
+                    {Ebutton()}
+                </div>
             </div>
         </div>
     )
