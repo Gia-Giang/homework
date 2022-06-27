@@ -24,7 +24,9 @@ const SearchUser = () => {
         handel: "sort",
         title: "id"
     })
-    console.log(listSearch)
+    //hellasdsa
+    //sadasdasdas
+    //jsadsadsadsad
     useEffect(() => {
         dispatch(getUser());
     }, [listSearch])
@@ -83,7 +85,7 @@ const SearchUser = () => {
     const Ebutton = () => {
         const arrayBtn = [];
         for (let i = 0; i < listSearch.length / 10; i++) {
-            arrayBtn.push(<button key={i} className={`${i == abs && "active_Slide_Page"} btnPage`} onClick={() => setAbs(i)} >{i}</button>)
+            arrayBtn.push(<button key={i} className={`${i == abs && "active_Slide_Page"} btnPage`} onClick={() => setAbs(i)} >{i + 1}</button>)
         }
         return arrayBtn
     }
@@ -112,67 +114,7 @@ const SearchUser = () => {
             title: title
         })
     }
-    const renderList = (list) => {
-        const a = list[handelSort.handel]((a, b) => a[handelSort.title] > (b[handelSort.title]));
-        return a.map((user, index) => {
-            const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
-            return (
-                <tfoot key={id} className={(showFixUser == id && toggleBgFix) ? "activeFix" : ""}>
-                    <tr>
-                        <td>{id}</td>
-                        <td>
-                            <img src={avatar} />
-                        </td>
-                        <td>{firstName + lastName}</td>
-                        <td>{userName}</td>
-                        <td>{email}</td>
-                        <td>{`${streetAddress} , ${city} , ${country}`}</td>
-                        <td>{GetDate(createdAt)}</td>
-                        <td>{jobTitle}</td>
-                        <td style={{ position: "relative" }}>
-                            {showFixUser == id &&
-                                idFix.map(users => {
-                                    return (
-                                        <div key={id} className="BoxFixUser" ref={RefBoxFixUser} style={{ display: "none" }}>
-                                            <h1>FIX USER</h1>
-                                            {renderItemInput("FirstName", "firstName", "firstName", users.firstName)}
-                                            {renderItemInput("LastName", "lastName", "lastName", users.lastName)}
-                                            {renderItemInput("avatar", "avatar", "avatar", users.avatar)}
-                                            {renderItemInput("Email", "email", "email", users.email)}
-                                            {renderItemInput("streetAddress", "streetAddress", "streetAddress", users.streetAddress)}
-                                            {renderItemInput("city", "city", "city", users.city)}
-                                            {renderItemInput("country", "country", "country", users.country)}
-                                            {renderItemInput("createdAt", "createdAt", "createdAt", users.createdAt)}
-                                            {renderItemInput("userName", "userName", "userName", users.userName)}
-                                            <div className="nameUser">
-                                                <b>Vị trí :</b>
-                                                <select name="jobTitle" onChange={handelJob}>
-                                                    <option>{optionJob}</option>
-                                                    {listOption.map((user) => {
-                                                        return <option key={user.id}>{user.type}</option>
-                                                    })}
-                                                </select>
-                                            </div>
-                                            <div className="nameUser">
-                                                <b>id :</b>
-                                                <span>{id}</span>
-                                            </div>
-                                            <div className="groupBtn">
-                                                <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
-                                                <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
-                                            </div>
-                                        </div>
-                                    )
-                                })
-                            }
-                            <span className="fixUser" onClick={() => handelFixUser(id, user)}>Fix</span>
-                            <span className="deleteUser" onClick={() => handelDeleteUser(id)}>X</span>
-                        </td>
-                    </tr>
-                </tfoot>
-            )
-        })
-    }
+
     const handelChangeSearch = (e) => {
         setUserSearch(e.target.value)
     }
@@ -195,6 +137,94 @@ const SearchUser = () => {
         e.stopPropagation();
         setToggleBgFix(false);
         RefBoxFixUser.current.style.display = "none";
+    }
+    const renderList = (list) => {
+        const a = (value) => {
+            return value.sort((a, b) => {
+                const m = handelSort.title;
+                let aa;
+                let bb;
+                let cc;
+                let dd;
+                let ee;
+                let ff;
+
+                if (m == "streetAddress") {
+                    aa = a.streetAddress.split(" ")
+                    bb = b.streetAddress.split(" ");
+                    return handelSort.handel === "sort" ? aa[0] - bb[0] : bb[0] - aa[0]
+                } else if (m == "createdAt") {
+                    cc = GetDate(a.createdAt).split("-");
+                    dd = GetDate(b.createdAt).split("-")
+                    return handelSort.handel === "sort" ? cc[0] - dd[0] : dd[0] - cc[0]
+                } else if (m == "jobTitle") {
+                    ee = a.jobTitle.split(" ");
+                    ff = b.jobTitle.split(" ");
+                    return handelSort.handel === "sort" ? ee[1] - ff[1] : ff[1] - ee[1]
+                } else if (m == "id") {
+                    return handelSort.handel === "sort" ? a.id - b.id : b.id - a.id
+                }
+                return handelSort.handel === "sort" ?
+                    a[handelSort.title][0].localeCompare(b[handelSort.title][0]) :
+                    b[handelSort.title][0].localeCompare(a[handelSort.title][0])
+            });
+        }
+        return a(list).map((user, index) => {
+            const { avatar, city, country, createdAt, email, firstName, id, jobTitle, lastName, streetAddress, userName } = user;
+            return (
+                <tr key={id} className={(showFixUser == id && toggleBgFix) ? "activeFix" : ""}>
+                    <td>{id}</td>
+                    <td>
+                        <img src={avatar} />
+                    </td>
+                    <td>{firstName + lastName}</td>
+                    <td>{userName}</td>
+                    <td>{email}</td>
+                    <td>{`${streetAddress} , ${city} , ${country}`}</td>
+                    <td>{GetDate(createdAt)}</td>
+                    <td>{jobTitle}</td>
+                    <td style={{ position: "relative" }}>
+                        {showFixUser == id &&
+                            idFix.map(users => {
+                                return (
+                                    <div key={id} className="BoxFixUser" ref={RefBoxFixUser} style={{ display: "none" }}>
+                                        <h1>FIX USER</h1>
+                                        {renderItemInput("FirstName", "firstName", "firstName", users.firstName)}
+                                        {renderItemInput("LastName", "lastName", "lastName", users.lastName)}
+                                        {renderItemInput("avatar", "avatar", "avatar", users.avatar)}
+                                        {renderItemInput("Email", "email", "email", users.email)}
+                                        {renderItemInput("streetAddress", "streetAddress", "streetAddress", users.streetAddress)}
+                                        {renderItemInput("city", "city", "city", users.city)}
+                                        {renderItemInput("country", "country", "country", users.country)}
+                                        {renderItemInput("createdAt", "createdAt", "createdAt", users.createdAt)}
+                                        {renderItemInput("userName", "userName", "userName", users.userName)}
+                                        <div className="nameUser">
+                                            <b>Vị trí :</b>
+                                            <select name="jobTitle" onChange={handelJob}>
+                                                <option>{optionJob}</option>
+                                                {listOption.map((user) => {
+                                                    return <option key={user.id}>{user.type}</option>
+                                                })}
+                                            </select>
+                                        </div>
+                                        <div className="nameUser">
+                                            <b>id :</b>
+                                            <span>{id}</span>
+                                        </div>
+                                        <div className="groupBtn">
+                                            <button className="BtnAddUser" onClick={() => handelSaveUser(id)}>Save</button>
+                                            <button className="BtnAddUser" onClick={handelCancel}>Cancel</button>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                        <span className="fixUser" onClick={() => handelFixUser(id, user)}>Fix</span>
+                        <span className="deleteUser" onClick={() => handelDeleteUser(id)}>X</span>
+                    </td>
+                </tr>
+            )
+        })
     }
     return (
         <div className="searchUser">
@@ -219,7 +249,7 @@ const SearchUser = () => {
                         <tr>
                             <th><span>STT</span> <SortListUser title="id" onclick={handelSortAscending} /></th>
                             <th></th>
-                            <th>Tên<SortListUser title="FirstName" onclick={handelSortAscending} /></th>
+                            <th>Tên<SortListUser title="firstName" onclick={handelSortAscending} /></th>
                             <th>Tên khác<SortListUser title="userName" onclick={handelSortAscending} /></th>
                             <th>Email<SortListUser title="email" onclick={handelSortAscending} /></th>
                             <th>Nơi ở<SortListUser title="streetAddress" onclick={handelSortAscending} /></th>

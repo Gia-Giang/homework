@@ -11,7 +11,6 @@ const reducers = (state = initState, action) => {
             }
         case "ADDUSER":
             return {
-                ...state,
                 user: [...state.user, action.content]
             }
         case "DELETEUSER":
